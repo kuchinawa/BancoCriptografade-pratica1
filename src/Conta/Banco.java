@@ -105,7 +105,7 @@ public class Banco  implements BancoInterface {
         Usuario usuario = contas.get(cpf);
         double saldo = Double.parseDouble(usuario.getSaldo());
         double valorInvestido = Double.parseDouble(valor);
-        usuario.setSaldo(String.valueOf(saldo + valorInvestido * 0.005)); // rendimento de 0.5% ao mês
+        usuario.setSaldo(String.valueOf(saldo + valorInvestido * 0.005));
         salvarDados();
     }
 
@@ -117,7 +117,7 @@ public class Banco  implements BancoInterface {
         Usuario usuario = contas.get(cpf);
         double saldo = Double.parseDouble(usuario.getSaldo());
         double valorInvestido = Double.parseDouble(valor);
-        usuario.setSaldo(String.valueOf(saldo + valorInvestido * 0.015)); // rendimento de 1.5% ao mês
+        usuario.setSaldo(String.valueOf(saldo + valorInvestido * 0.015));
         salvarDados();
     }
 
@@ -138,7 +138,6 @@ public class Banco  implements BancoInterface {
                 System.out.println("Erro ao carregar dados do arquivo.");
             }
         } catch (IOException | ClassNotFoundException e) {
-            // Arquivo ainda não existe ou erro ao ler
             System.out.println("Arquivo de dados ainda não existe ou ocorreu um erro ao ler os dados.");
         }
     }

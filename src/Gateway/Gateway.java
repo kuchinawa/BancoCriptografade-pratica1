@@ -17,8 +17,16 @@ public class Gateway implements GatewayInterface{
     public Map<String, Chaves> clientes = new HashMap<>();;
     static BancoInterface stubBancoInterface;
 
-    public Usuario logar(String ipCliente, String cpf, String senha) throws RemoteException {
-        String usuario = cpf + "-" + senha;
+    @Override
+    public Usuario logar(String ipCliente, String cpf, String senha) throws Exception {
+        if (clientes.containsKey(ipCliente)){
+            Chaves chave = clientes.get(ipCliente);
+            String cpfDescriptografado = AES.decifrar(cpf, chave.CHAVE_AES);
+            cpfDescriptografado = Vernam.decifrar(cpfDescriptografado, chave.CHAVE_VERNAM);
+            String senhaDescriptografada = AES.decifrar(senha, chave.CHAVE_AES);
+            senhaDescriptografada = Vernam.decifrar(senhaDescriptografada, chave.CHAVE_VERNAM);
+            return stubBancoInterface.autenticar(cpfDescriptografado, senhaDescriptografada);
+        }
         return null;
     }
 
@@ -29,6 +37,7 @@ public class Gateway implements GatewayInterface{
             String dadosDescriptografados = AES.decifrar(dados, chave.CHAVE_AES);
             dadosDescriptografados = Vernam.decifrar(dadosDescriptografados, chave.CHAVE_VERNAM);
             stubBancoInterface.criarConta(dadosDescriptografados);
+            System.out.println("Dados descriptogradados: " + dadosDescriptografados);
         }
 
     }
@@ -99,7 +108,7 @@ public class Gateway implements GatewayInterface{
 
     }
 
-    public Gateway(){
+    public static void main(String[] args) {
         try {
             Registry registro1 = LocateRegistry.getRegistry("localhost", 6001);
             stubBancoInterface = (BancoInterface) registro1.lookup("Banco");

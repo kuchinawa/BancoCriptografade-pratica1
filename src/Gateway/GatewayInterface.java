@@ -8,7 +8,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface GatewayInterface extends Remote{
-    Usuario logar(String ipCliente, String cpf, String senha) throws RemoteException;
+    Usuario logar(String ipCliente, String cpf, String senha) throws Exception;
 
     // Criação de conta corrente
     void cadastro(String ipCliente, String dados) throws Exception;
