@@ -26,23 +26,16 @@ public class Banco implements BancoInterface {
     public String logar(String ipCliente, String cpf, String senha) throws Exception {
         if (clientes.containsKey(ipCliente)){
             Chaves chave = clientes.get(ipCliente);
-            System.out.println("Chave AES: " + chave.CHAVE_AES);
-            System.out.println("Chave Vernam: " + chave.CHAVE_VERNAM);
-            System.out.println(chave);
             String cpfDescriptografado = AES.decifrar(cpf, chave.CHAVE_AES);
             cpfDescriptografado = Vernam.decifrar(cpfDescriptografado, chave.CHAVE_VERNAM);
             String senhaDescriptografada = AES.decifrar(senha, chave.CHAVE_AES);
             senhaDescriptografada = Vernam.decifrar(senhaDescriptografada, chave.CHAVE_VERNAM);
-            System.out.println("CPF descriptografado: " + cpfDescriptografado);
-            System.out.println("Senha descriptografada: " + senhaDescriptografada);
             if (contas.containsKey(cpfDescriptografado)) {
-                System.out.println("Conta encontrada");
                 Usuario usuario = contas.get(cpfDescriptografado);
                 if (usuario.getSenha().equals(senhaDescriptografada)) {
                     String dadosCriptografados = usuario.getNome() + "-" + usuario.getCpf();
                     dadosCriptografados = Vernam.cifrar(dadosCriptografados, chave.CHAVE_VERNAM);
                     dadosCriptografados = AES.cifrar(dadosCriptografados, chave.CHAVE_AES);
-                    System.out.println("Dados criptografados: " + dadosCriptografados);
                     return dadosCriptografados;
                 }
             }
@@ -69,7 +62,6 @@ public class Banco implements BancoInterface {
 
                 dadosCriptografados = Vernam.cifrar(dadosCriptografados, chave.CHAVE_VERNAM);
                 dadosCriptografados = AES.cifrar(dadosCriptografados, chave.CHAVE_AES);
-                System.out.println("Dados criptografados: " + dadosCriptografados);
                 return dadosCriptografados;
             }
             return null;
