@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Main {
     static BancoInterface stub;
-    static String ipCliente = "5552";
+    static String ipCliente = "5553";
     static String nome = null;
     static String cpf = null;
 
@@ -81,11 +81,16 @@ public class Main {
 
                     try {
                         String saque = stub.sacar(ipCliente, cpfCriptografado, valorCriptografado);
+                       if (saque == null) {
+                           System.out.println("Saldo insuficiente.");
+                           break;
+                       }
                         saque = AES.decifrar(saque, chave.CHAVE_AES);
                         saque = Vernam.decifrar(saque, chave.CHAVE_VERNAM);
                         saque = saque.split("-")[4];
                         System.out.println("Você sacou " + valor + " dinheiros, seu novo saldo é de " + saque);
                     } catch (Exception e) {
+
                         throw new RuntimeException(e);
                     }
                     break;
@@ -100,6 +105,10 @@ public class Main {
 
                     try {
                        String depositar = stub.depositar(ipCliente, cpfCriptografado, valorCriptografado);
+                       if (depositar == null) {
+                           System.out.println("Erro ao depositar.");
+                           break;
+                       }
                        depositar = AES.decifrar(depositar, chave.CHAVE_AES);
                        depositar = Vernam.decifrar(depositar, chave.CHAVE_VERNAM);
                        depositar = depositar.split("-")[4];
@@ -126,6 +135,10 @@ public class Main {
 
                     try {
                         String transferiu = stub.transferir(ipCliente, contaOrigemCriptografada, contaDestinoCriptografada, valorCriptografado);
+                        if(transferiu == null){
+                            System.out.println("Erro ao transferir :(");
+                            break;
+                        }
                         transferiu = AES.decifrar(transferiu, chave.CHAVE_AES);
                         transferiu = Vernam.decifrar(transferiu, chave.CHAVE_VERNAM);
                         System.out.println("Você transferiu " + valor + " dinheiros para a conta de " + transferiu.split("-")[1] + " seu novo saldo é de: " + transferiu.split("-")[0] + ".");
@@ -150,6 +163,10 @@ public class Main {
                                 cpfCriptografado = AES.cifrar(cpfCriptografado, chave.CHAVE_AES);
                                 try {
                                     String poupanca = stub.investirPoupanca(ipCliente, cpfCriptografado);
+                                    if (poupanca == null) {
+                                        System.out.println("Erro ao investir.");
+                                        break;
+                                    }
                                     poupanca = AES.decifrar(poupanca, chave.CHAVE_AES);
                                     poupanca = Vernam.decifrar(poupanca, chave.CHAVE_VERNAM);
 
@@ -172,6 +189,10 @@ public class Main {
                                 valorCriptografado = AES.cifrar(valorCriptografado, chave.CHAVE_AES);
                                 try {
                                     String renda = stub.investirRendaFixa(ipCliente, cpfCriptografado, valorCriptografado);
+                                    if (renda == null) {
+                                        System.out.println("Erro ao investir.");
+                                        break;
+                                    }
                                     renda = AES.decifrar(renda, chave.CHAVE_AES);
                                     renda = Vernam.decifrar(renda, chave.CHAVE_VERNAM);
                                     System.out.println("Seu saldo atual é: " + String.format("%.2f", Double.parseDouble(renda.split("-")[0]))
@@ -217,9 +238,6 @@ public class Main {
 
                     try {
                         stub.cadastro(ipCliente, dadosCriptografados);
-                        System.out.println("Dados: " + dados);
-                        System.out.println("Dados criptografados: " + dadosCriptografados);
-
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -237,13 +255,18 @@ public class Main {
 
                     try {
                         String conta = stub.logar(ipCliente, cpfCriptografado, senhaCriptografada);
-                        conta = AES.decifrar(conta, chave.CHAVE_AES);
-                        conta = Vernam.decifrar(conta, chave.CHAVE_VERNAM);
 
-                        autenticado = true;
-                        nome = conta.split("-")[0];
-                        cpf = conta.split("-")[1];
+                        if (conta != null) {
+                            conta = AES.decifrar(conta, chave.CHAVE_AES);
+                            conta = Vernam.decifrar(conta, chave.CHAVE_VERNAM);
 
+                            autenticado = true;
+                            nome = conta.split("-")[0];
+                            cpf = conta.split("-")[1];
+                        }else{
+                            System.out.println("CPF ou senha inválidos, tente novamente.");
+                        }
+                     //   ipCliente = "9999";
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
